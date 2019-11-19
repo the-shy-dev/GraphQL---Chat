@@ -1,8 +1,10 @@
-const db = require('./db');
 const { PubSub } = require('graphql-subscriptions');
+const db = require('./db');
 
 const MESSAGE_ADDED = 'MESSAGE_ADDED';
+
 const pubSub = new PubSub();
+
 function requireAuth(userId) {
   if (!userId) {
     throw new Error('Unauthorized');
@@ -14,7 +16,7 @@ const Query = {
     requireAuth(userId);
     return db.messages.list();
   }
-}
+};
 
 const Mutation = {
   addMessage: (_root, {input}, {userId}) => {
@@ -24,12 +26,12 @@ const Mutation = {
     pubSub.publish(MESSAGE_ADDED, {messageAdded: message});
     return message;
   }
-}
+};
 
 const Subscription = {
   messageAdded: {
-    subscription: () => pubSub.asyncIterator(MESSAGE_ADDED)
+    subscribe: () => pubSub.asyncIterator(MESSAGE_ADDED)
   }
-}
+};
 
 module.exports = { Query, Mutation, Subscription };
